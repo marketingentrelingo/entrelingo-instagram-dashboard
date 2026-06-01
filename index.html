@@ -63,7 +63,7 @@ td:first-child{text-align:left;font-weight:600;color:#2D2440}
 
 <div class="header">
   <div>
-    <h1>📊 Dashboard Instagram · @mafegarcia_au</h1>
+    <h1 id="headerTitle">📊 Dashboard Instagram · @mafegarcia_au</h1>
     <p>Seguimiento semanal de KPIs · Entrelingo Marketing</p>
   </div>
   <div class="header-right">
@@ -71,6 +71,12 @@ td:first-child{text-align:left;font-weight:600;color:#2D2440}
     <span class="badge" id="modeBadge"></span>
     <button class="btn" id="reloadBtn" onclick="tryLiveData()">↻ Actualizar</button>
   </div>
+</div>
+
+<div style="background:#4A2D7A;padding:8px 20px;display:flex;gap:8px;align-items:center">
+  <span style="font-size:11px;color:rgba(255,255,255,.7);font-weight:700;margin-right:4px">CUENTA:</span>
+  <button id="btnMafe" onclick="switchAccount('mafe')" style="padding:6px 14px;border-radius:16px;border:1.5px solid rgba(255,255,255,.5);background:rgba(255,255,255,.25);color:#fff;font-size:12px;font-weight:700;cursor:pointer">@mafegarcia_au</button>
+  <button id="btnEntrelingo" onclick="switchAccount('entrelingo')" style="padding:6px 14px;border-radius:16px;border:1.5px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.7);font-size:12px;font-weight:600;cursor:pointer">@entrelingo</button>
 </div>
 
 <div class="week-bar" id="weekBar">
@@ -111,8 +117,8 @@ td:first-child{text-align:left;font-weight:600;color:#2D2440}
 </div>
 
 <script>
-// ─── DATOS EMBEBIDOS (fuente: Windsor.ai 06-abr → 01-jun 2026) ───────────────
-const EMBEDDED = [
+// ─── DATOS EMBEBIDOS @mafegarcia_au (Windsor.ai 06-abr → 01-jun 2026) ────────
+const EMBEDDED_MAFE = [
 {"date":"2026-04-06","reach_1d":3678,"likes":82,"comments":18,"saves":34,"shares":55,"reposts":2,"views":8865,"total_interactions":252,"accounts_engaged":164},
 {"date":"2026-04-07","reach_1d":3764,"likes":146,"comments":23,"saves":41,"shares":61,"reposts":5,"views":7889,"total_interactions":342,"accounts_engaged":217},
 {"date":"2026-04-08","reach_1d":4645,"likes":144,"comments":21,"saves":34,"shares":63,"reposts":2,"views":13303,"total_interactions":351,"accounts_engaged":232},
@@ -171,9 +177,75 @@ const EMBEDDED = [
 {"date":"2026-05-31","reach_1d":38875,"likes":772,"comments":59,"saves":290,"shares":244,"reposts":14,"views":80919,"total_interactions":1628,"accounts_engaged":1133,"follower_count_1d":0}
 ];
 
+// ─── DATOS EMBEBIDOS @entrelingo (Windsor.ai 06-abr → 01-jun 2026) ───────────
+const EMBEDDED_ENTRELINGO = [
+{"date":"2026-04-06","reach_1d":17209,"likes":776,"comments":38,"saves":89,"shares":357,"reposts":14,"views":27278,"total_interactions":1634,"accounts_engaged":1036},
+{"date":"2026-04-07","reach_1d":16114,"likes":666,"comments":22,"saves":80,"shares":330,"reposts":18,"views":24425,"total_interactions":1449,"accounts_engaged":873},
+{"date":"2026-04-08","reach_1d":16485,"likes":939,"comments":26,"saves":133,"shares":342,"reposts":26,"views":27200,"total_interactions":1808,"accounts_engaged":1214},
+{"date":"2026-04-09","reach_1d":24758,"likes":1455,"comments":50,"saves":207,"shares":709,"reposts":39,"views":41083,"total_interactions":3169,"accounts_engaged":1882},
+{"date":"2026-04-10","reach_1d":30511,"likes":1685,"comments":146,"saves":270,"shares":1391,"reposts":46,"views":47028,"total_interactions":4930,"accounts_engaged":2395},
+{"date":"2026-04-11","reach_1d":25001,"likes":1329,"comments":88,"saves":202,"shares":879,"reposts":26,"views":39393,"total_interactions":3404,"accounts_engaged":1782},
+{"date":"2026-04-12","reach_1d":18512,"likes":848,"comments":83,"saves":139,"shares":507,"reposts":23,"views":29098,"total_interactions":2109,"accounts_engaged":1185},
+{"date":"2026-04-13","reach_1d":12440,"likes":545,"comments":67,"saves":100,"shares":310,"reposts":8,"views":20295,"total_interactions":1343,"accounts_engaged":778},
+{"date":"2026-04-14","reach_1d":13395,"likes":580,"comments":65,"saves":124,"shares":437,"reposts":25,"views":21308,"total_interactions":1669,"accounts_engaged":890},
+{"date":"2026-04-15","reach_1d":11520,"likes":487,"comments":68,"saves":127,"shares":320,"reposts":20,"views":17943,"total_interactions":1344,"accounts_engaged":788},
+{"date":"2026-04-16","reach_1d":8817,"likes":464,"comments":45,"saves":85,"shares":247,"reposts":13,"views":13840,"total_interactions":1101,"accounts_engaged":597},
+{"date":"2026-04-17","reach_1d":8344,"likes":425,"comments":41,"saves":67,"shares":244,"reposts":13,"views":13412,"total_interactions":1035,"accounts_engaged":550},
+{"date":"2026-04-18","reach_1d":9133,"likes":416,"comments":40,"saves":73,"shares":265,"reposts":6,"views":13698,"total_interactions":1067,"accounts_engaged":599},
+{"date":"2026-04-19","reach_1d":9972,"likes":488,"comments":37,"saves":70,"shares":213,"reposts":11,"views":16844,"total_interactions":1034,"accounts_engaged":676},
+{"date":"2026-04-20","reach_1d":8967,"likes":363,"comments":39,"saves":75,"shares":168,"reposts":10,"views":15223,"total_interactions":826,"accounts_engaged":522},
+{"date":"2026-04-21","reach_1d":8899,"likes":368,"comments":37,"saves":63,"shares":169,"reposts":11,"views":14256,"total_interactions":817,"accounts_engaged":490},
+{"date":"2026-04-22","reach_1d":8247,"likes":283,"comments":16,"saves":43,"shares":149,"reposts":9,"views":11979,"total_interactions":649,"accounts_engaged":386},
+{"date":"2026-04-23","reach_1d":7387,"likes":309,"comments":20,"saves":47,"shares":136,"reposts":9,"views":11833,"total_interactions":657,"accounts_engaged":415},
+{"date":"2026-04-24","reach_1d":11780,"likes":458,"comments":32,"saves":76,"shares":230,"reposts":15,"views":20088,"total_interactions":1041,"accounts_engaged":631},
+{"date":"2026-04-25","reach_1d":15131,"likes":502,"comments":35,"saves":70,"shares":215,"reposts":11,"views":24173,"total_interactions":1049,"accounts_engaged":689},
+{"date":"2026-04-26","reach_1d":12009,"likes":418,"comments":34,"saves":60,"shares":163,"reposts":10,"views":19475,"total_interactions":853,"accounts_engaged":579},
+{"date":"2026-04-27","reach_1d":9760,"likes":415,"comments":31,"saves":61,"shares":143,"reposts":4,"views":18544,"total_interactions":803,"accounts_engaged":529},
+{"date":"2026-04-28","reach_1d":8990,"likes":402,"comments":44,"saves":62,"shares":128,"reposts":7,"views":15412,"total_interactions":772,"accounts_engaged":543},
+{"date":"2026-04-29","reach_1d":6570,"likes":312,"comments":37,"saves":43,"shares":90,"reposts":8,"views":10411,"total_interactions":582,"accounts_engaged":386},
+{"date":"2026-04-30","reach_1d":7004,"likes":260,"comments":26,"saves":45,"shares":71,"reposts":11,"views":10785,"total_interactions":484,"accounts_engaged":337},
+{"date":"2026-05-01","reach_1d":7857,"likes":338,"comments":17,"saves":54,"shares":94,"reposts":9,"views":12332,"total_interactions":610,"accounts_engaged":430},
+{"date":"2026-05-02","reach_1d":9985,"likes":438,"comments":19,"saves":53,"shares":116,"reposts":13,"views":15420,"total_interactions":755,"accounts_engaged":520,"follower_count_1d":26},
+{"date":"2026-05-03","reach_1d":10520,"likes":582,"comments":31,"saves":140,"shares":183,"reposts":5,"views":21277,"total_interactions":1124,"accounts_engaged":783,"follower_count_1d":30},
+{"date":"2026-05-04","reach_1d":8948,"likes":519,"comments":36,"saves":132,"shares":208,"reposts":3,"views":21814,"total_interactions":1111,"accounts_engaged":713,"follower_count_1d":25},
+{"date":"2026-05-05","reach_1d":8415,"likes":377,"comments":41,"saves":66,"shares":84,"reposts":3,"views":16170,"total_interactions":655,"accounts_engaged":489,"follower_count_1d":30},
+{"date":"2026-05-06","reach_1d":9243,"likes":490,"comments":40,"saves":60,"shares":185,"reposts":6,"views":14884,"total_interactions":966,"accounts_engaged":627,"follower_count_1d":29},
+{"date":"2026-05-07","reach_1d":8090,"likes":358,"comments":41,"saves":63,"shares":166,"reposts":7,"views":12859,"total_interactions":801,"accounts_engaged":502,"follower_count_1d":33},
+{"date":"2026-05-08","reach_1d":6397,"likes":308,"comments":34,"saves":49,"shares":117,"reposts":6,"views":10230,"total_interactions":631,"accounts_engaged":423,"follower_count_1d":16},
+{"date":"2026-05-09","reach_1d":6831,"likes":303,"comments":22,"saves":52,"shares":108,"reposts":9,"views":11181,"total_interactions":602,"accounts_engaged":415,"follower_count_1d":27},
+{"date":"2026-05-10","reach_1d":6893,"likes":274,"comments":21,"saves":47,"shares":97,"reposts":6,"views":11219,"total_interactions":547,"accounts_engaged":375,"follower_count_1d":25},
+{"date":"2026-05-11","reach_1d":8035,"likes":377,"comments":23,"saves":53,"shares":78,"reposts":15,"views":14067,"total_interactions":626,"accounts_engaged":454,"follower_count_1d":28},
+{"date":"2026-05-12","reach_1d":6532,"likes":278,"comments":18,"saves":32,"shares":129,"reposts":10,"views":11870,"total_interactions":598,"accounts_engaged":336,"follower_count_1d":24},
+{"date":"2026-05-13","reach_1d":5717,"likes":231,"comments":16,"saves":30,"shares":74,"reposts":2,"views":10008,"total_interactions":428,"accounts_engaged":292,"follower_count_1d":18},
+{"date":"2026-05-14","reach_1d":7537,"likes":320,"comments":26,"saves":46,"shares":87,"reposts":3,"views":12591,"total_interactions":573,"accounts_engaged":409,"follower_count_1d":25},
+{"date":"2026-05-15","reach_1d":6842,"likes":285,"comments":9,"saves":40,"shares":78,"reposts":5,"views":11506,"total_interactions":496,"accounts_engaged":355,"follower_count_1d":17},
+{"date":"2026-05-16","reach_1d":7800,"likes":332,"comments":21,"saves":47,"shares":120,"reposts":6,"views":12527,"total_interactions":648,"accounts_engaged":436,"follower_count_1d":27},
+{"date":"2026-05-17","reach_1d":8052,"likes":360,"comments":30,"saves":40,"shares":111,"reposts":11,"views":13723,"total_interactions":669,"accounts_engaged":436,"follower_count_1d":18},
+{"date":"2026-05-18","reach_1d":12213,"likes":713,"comments":31,"saves":67,"shares":303,"reposts":30,"views":21844,"total_interactions":1451,"accounts_engaged":867,"follower_count_1d":29},
+{"date":"2026-05-19","reach_1d":10338,"likes":606,"comments":52,"saves":67,"shares":284,"reposts":21,"views":16133,"total_interactions":1314,"accounts_engaged":749,"follower_count_1d":22},
+{"date":"2026-05-20","reach_1d":7594,"likes":345,"comments":40,"saves":49,"shares":221,"reposts":14,"views":11876,"total_interactions":890,"accounts_engaged":507,"follower_count_1d":28},
+{"date":"2026-05-21","reach_1d":13966,"likes":877,"comments":89,"saves":126,"shares":451,"reposts":38,"views":23193,"total_interactions":2032,"accounts_engaged":1207,"follower_count_1d":73},
+{"date":"2026-05-22","reach_1d":12644,"likes":677,"comments":49,"saves":104,"shares":423,"reposts":25,"views":20540,"total_interactions":1701,"accounts_engaged":886,"follower_count_1d":43},
+{"date":"2026-05-23","reach_1d":8914,"likes":458,"comments":40,"saves":64,"shares":213,"reposts":23,"views":16188,"total_interactions":1012,"accounts_engaged":585,"follower_count_1d":25},
+{"date":"2026-05-24","reach_1d":8299,"likes":433,"comments":42,"saves":40,"shares":185,"reposts":9,"views":14798,"total_interactions":900,"accounts_engaged":534,"follower_count_1d":25},
+{"date":"2026-05-25","reach_1d":9029,"likes":303,"comments":36,"saves":57,"shares":147,"reposts":7,"views":14546,"total_interactions":703,"accounts_engaged":418,"follower_count_1d":28},
+{"date":"2026-05-26","reach_1d":7361,"likes":280,"comments":20,"saves":38,"shares":150,"reposts":7,"views":13078,"total_interactions":645,"accounts_engaged":359,"follower_count_1d":28},
+{"date":"2026-05-27","reach_1d":7411,"likes":332,"comments":39,"saves":50,"shares":152,"reposts":11,"views":12592,"total_interactions":737,"accounts_engaged":430,"follower_count_1d":22},
+{"date":"2026-05-28","reach_1d":6427,"likes":289,"comments":31,"saves":52,"shares":109,"reposts":6,"views":10926,"total_interactions":597,"accounts_engaged":387,"follower_count_1d":20},
+{"date":"2026-05-29","reach_1d":5292,"likes":246,"comments":22,"saves":31,"shares":136,"reposts":7,"views":10525,"total_interactions":579,"accounts_engaged":335,"follower_count_1d":22},
+{"date":"2026-05-30","reach_1d":7700,"likes":423,"comments":26,"saves":85,"shares":126,"reposts":20,"views":15294,"total_interactions":807,"accounts_engaged":489,"follower_count_1d":22},
+{"date":"2026-05-31","reach_1d":12004,"likes":424,"comments":22,"saves":41,"shares":104,"reposts":13,"views":18910,"total_interactions":708,"accounts_engaged":507,"follower_count_1d":26}
+];
+
+let currentAccount = 'mafe';
+let EMBEDDED = EMBEDDED_MAFE;
+
 // ─── CONSTANTS ───────────────────────────────────────────────────────────────
 const TOOL = "mcp__ed6dc9e2-60a6-465c-b5c5-fef7d79a0e1e__get_data";
-const ACCOUNT_ID = "17841401468533719";
+const ACCOUNTS = {
+  mafe: { id: "17841401468533719", handle: "@mafegarcia_au", label: "Mafe Garcia PRO", data: null },
+  entrelingo: { id: "17841417877247504", handle: "@entrelingo", label: "Entrelingo", data: null }
+};
 const MO = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const DN = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
 const PURPLE='#5C3D8F',TEAL='#00897B',ORANGE='#E65100',BLUE='#1565C0',PINK='#AD1457';
@@ -400,7 +472,7 @@ async function tryLiveData(){
 
     const res=await window.cowork.callMcpTool(TOOL,{
       connector:'instagram',
-      accounts:[ACCOUNT_ID],
+      accounts:[ACCOUNTS[currentAccount].id],
       fields:['date','reach_1d','likes','comments','saves','shares','reposts','views','total_interactions','accounts_engaged'],
       date_from:fromStr,
       date_to:toStr
@@ -419,6 +491,7 @@ async function tryLiveData(){
     data=data.filter(d=>d&&d.date&&typeof d.date==='string'&&d.date.length>=8);
     if(!data.length)throw new Error('Respuesta vacía');
 
+    ACCOUNTS[currentAccount].data = data;
     renderAll(data,true);
   }catch(err){
     // show info but don't crash — keep showing embedded data
@@ -431,8 +504,29 @@ async function tryLiveData(){
   }
 }
 
+// ─── SWITCH ACCOUNT ───────────────────────────────────────────────────────────
+function switchAccount(key){
+  currentAccount = key;
+  EMBEDDED = key === 'mafe' ? EMBEDDED_MAFE : EMBEDDED_ENTRELINGO;
+  const acc = ACCOUNTS[key];
+  document.getElementById('headerTitle').textContent = '📊 Dashboard Instagram · ' + acc.handle;
+
+  // Update button styles
+  document.getElementById('btnMafe').style.background = key==='mafe'?'rgba(255,255,255,.25)':'transparent';
+  document.getElementById('btnMafe').style.color = key==='mafe'?'#fff':'rgba(255,255,255,.7)';
+  document.getElementById('btnMafe').style.borderColor = key==='mafe'?'rgba(255,255,255,.5)':'rgba(255,255,255,.3)';
+  document.getElementById('btnEntrelingo').style.background = key==='entrelingo'?'rgba(255,255,255,.25)':'transparent';
+  document.getElementById('btnEntrelingo').style.color = key==='entrelingo'?'#fff':'rgba(255,255,255,.7)';
+  document.getElementById('btnEntrelingo').style.borderColor = key==='entrelingo'?'rgba(255,255,255,.5)':'rgba(255,255,255,.3)';
+
+  // Use cached live data if available
+  const liveData = acc.data;
+  if(liveData) { renderAll(liveData, true); }
+  else { renderAll(EMBEDDED, false); tryLiveData(); }
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-renderAll(EMBEDDED,false);
+renderAll(EMBEDDED_MAFE, false);
 tryLiveData();
 
 // Auto-recarga la página cada 30 min para mostrar la versión más reciente publicada

@@ -434,6 +434,16 @@ async function tryLiveData(){
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 renderAll(EMBEDDED,false);
 tryLiveData();
+
+// Auto-recarga la página cada 30 min para mostrar la versión más reciente publicada
+setTimeout(()=>location.reload(), 30*60*1000);
+
+// Botón actualizar: si no hay Cowork, recarga la página completa
+document.getElementById('reloadBtn').addEventListener('click',function(){
+  if(typeof window.cowork==='undefined'||typeof window.cowork.callMcpTool!=='function'){
+    location.reload(true);
+  }
+});
 </script>
 </body>
 </html>

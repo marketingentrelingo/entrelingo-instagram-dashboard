@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Instagram @mafegarcia_au</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.js"></script>
+<style>
+:root{color-scheme:light}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#F4F2FA;color:#2D2440;font-size:14px}
+.header{background:linear-gradient(135deg,#5C3D8F,#7B52A8);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.header h1{font-size:17px;font-weight:700}
+.header p{font-size:11px;opacity:.8;margin-top:2px}
+.header-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:background .2s}
+.btn:hover{background:rgba(255,255,255,.35)}
+.badge{font-size:10px;padding:3px 8px;border-radius:10px;font-weight:700}
+.badge-live{background:#C8E6C9;color:#2E7D32}
+.badge-cache{background:#FFF9C4;color:#F57F17}
+.updated{font-size:11px;opacity:.75}
+.week-bar{background:#fff;border-bottom:1px solid #E8E2F5;padding:10px 20px;display:flex;gap:6px;align-items:center;overflow-x:auto;flex-wrap:wrap}
+.week-bar label{font-size:11px;color:#78909C;font-weight:700;white-space:nowrap;margin-right:4px}
+.chip{padding:5px 11px;border-radius:16px;border:1.5px solid #D5C8E8;background:#fff;color:#5C3D8F;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.chip:hover{background:#EDE7F6}
+.chip.active{background:#5C3D8F;color:#fff;border-color:#5C3D8F}
+.content{padding:16px 20px;max-width:1100px;margin:0 auto}
+.sec{font-size:11px;font-weight:700;color:#78909C;letter-spacing:.8px;text-transform:uppercase;margin:18px 0 10px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media(max-width:750px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kcard{background:#fff;border-radius:10px;padding:14px;box-shadow:0 1px 4px rgba(92,61,143,.08);border:1px solid #EDE7F6;position:relative;overflow:hidden}
+.kcard::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--a,#5C3D8F)}
+.klabel{font-size:10px;color:#78909C;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.kval{font-size:26px;font-weight:700;color:#2D2440;line-height:1}
+.kdelta{display:flex;gap:6px;align-items:center;margin-top:5px}
+.tag{font-size:11px;font-weight:700;padding:2px 6px;border-radius:8px}
+.up{background:#E8F5E9;color:#2E7D32}
+.dn{background:#FFEBEE;color:#C62828}
+.nt{background:#ECEFF1;color:#546E7A}
+.kprev{font-size:10px;color:#B0BEC5}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:750px){.charts-grid{grid-template-columns:1fr}}
+.ccard{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(92,61,143,.08);border:1px solid #EDE7F6}
+.ctitle{font-size:12px;font-weight:700;color:#2D2440;margin-bottom:12px}
+.cwrap{position:relative;height:190px}
+.full{grid-column:1/-1}
+.full .cwrap{height:210px}
+.tcard{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(92,61,143,.08);border:1px solid #EDE7F6;overflow-x:auto;margin-top:4px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#5C3D8F;color:#fff;padding:8px 10px;text-align:right;font-weight:600;white-space:nowrap}
+th:first-child{text-align:left;border-radius:6px 0 0 6px}
+th:last-child{border-radius:0 6px 6px 0}
+tr:nth-child(even){background:#F9F7FD}
+td{padding:7px 10px;text-align:right;color:#37474F;border-bottom:1px solid #F0EBF8;white-space:nowrap}
+td:first-child{text-align:left;font-weight:600;color:#2D2440}
+.best{color:#2E7D32;font-weight:700}
+.sel-row{background:#EDE7F6!important;font-weight:700}
+.vbadge{display:inline-block;background:#FFF3E0;color:#E65100;font-size:9px;font-weight:700;padding:1px 5px;border-radius:6px;margin-left:4px;vertical-align:middle}
+.info-box{background:#E3F2FD;border-left:4px solid #1565C0;border-radius:6px;padding:10px 14px;font-size:12px;color:#1565C0;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>📊 Dashboard Instagram · @mafegarcia_au</h1>
+    <p>Seguimiento semanal de KPIs · Entrelingo Marketing</p>
+  </div>
+  <div class="header-right">
+    <span class="updated" id="updatedAt"></span>
+    <span class="badge" id="modeBadge"></span>
+    <button class="btn" id="reloadBtn" onclick="tryLiveData()">↻ Actualizar</button>
+  </div>
+</div>
+
+<div class="week-bar" id="weekBar">
+  <label>Semana activa:</label>
+</div>
+
+<div class="content">
+  <div class="info-box" id="infoBox" style="display:none"></div>
+
+  <div class="sec">KPIs — semana seleccionada vs semana anterior</div>
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <div class="sec">Tendencia — últimas 8 semanas</div>
+  <div class="charts-grid">
+    <div class="ccard full"><div class="ctitle">📡 Reach semanal &nbsp;|&nbsp; 👁️ Views semanales</div><div class="cwrap"><canvas id="cReach"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">⚡ Interacciones totales</div><div class="cwrap"><canvas id="cEng"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">🔖 Saves &nbsp; 📤 Shares &nbsp; 🔁 Reposts</div><div class="cwrap"><canvas id="cSaves"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">❤️ Likes &nbsp; 💬 Comentarios</div><div class="cwrap"><canvas id="cLikes"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">👥 Cuentas alcanzadas con engagement</div><div class="cwrap"><canvas id="cAcc"></canvas></div></div>
+    <div class="ccard"><div class="ctitle">👤 Nuevos seguidores por semana</div><div class="cwrap"><canvas id="cFollowers"></canvas></div></div>
+  </div>
+
+  <div class="sec">Detalle diario — semana seleccionada</div>
+  <div class="tcard">
+    <table>
+      <thead><tr><th>Día</th><th>+Seguidores</th><th>Reach</th><th>Views</th><th>Interacciones</th><th>Likes</th><th>Comentarios</th><th>Saves</th><th>Shares</th><th>Reposts</th><th>Ctas c/Eng.</th></tr></thead>
+      <tbody id="dailyBody"></tbody>
+    </table>
+  </div>
+
+  <div class="sec">Resumen histórico por semana</div>
+  <div class="tcard">
+    <table>
+      <thead><tr><th>Semana</th><th>+Seguidores</th><th>Reach</th><th>Views</th><th>Interacciones</th><th>Likes</th><th>Saves</th><th>Shares</th><th>Comentarios</th><th>Ctas c/Eng.</th><th>Reach/día</th></tr></thead>
+      <tbody id="weekBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ─── DATOS EMBEBIDOS (fuente: Windsor.ai 06-abr → 01-jun 2026) ───────────────
+const EMBEDDED = [
+{"date":"2026-04-06","reach_1d":3678,"likes":82,"comments":18,"saves":34,"shares":55,"reposts":2,"views":8865,"total_interactions":252,"accounts_engaged":164},
+{"date":"2026-04-07","reach_1d":3764,"likes":146,"comments":23,"saves":41,"shares":61,"reposts":5,"views":7889,"total_interactions":342,"accounts_engaged":217},
+{"date":"2026-04-08","reach_1d":4645,"likes":144,"comments":21,"saves":34,"shares":63,"reposts":2,"views":13303,"total_interactions":351,"accounts_engaged":232},
+{"date":"2026-04-09","reach_1d":4357,"likes":135,"comments":28,"saves":36,"shares":44,"reposts":3,"views":10530,"total_interactions":293,"accounts_engaged":206},
+{"date":"2026-04-10","reach_1d":4307,"likes":127,"comments":11,"saves":23,"shares":24,"reposts":3,"views":9344,"total_interactions":219,"accounts_engaged":173},
+{"date":"2026-04-11","reach_1d":5615,"likes":222,"comments":26,"saves":184,"shares":154,"reposts":5,"views":13032,"total_interactions":746,"accounts_engaged":453},
+{"date":"2026-04-12","reach_1d":6735,"likes":229,"comments":13,"saves":227,"shares":201,"reposts":2,"views":14407,"total_interactions":878,"accounts_engaged":551},
+{"date":"2026-04-13","reach_1d":6649,"likes":285,"comments":27,"saves":201,"shares":213,"reposts":3,"views":15757,"total_interactions":943,"accounts_engaged":521},
+{"date":"2026-04-14","reach_1d":5340,"likes":260,"comments":30,"saves":104,"shares":158,"reposts":3,"views":13981,"total_interactions":728,"accounts_engaged":440},
+{"date":"2026-04-15","reach_1d":5714,"likes":194,"comments":40,"saves":81,"shares":152,"reposts":8,"views":13383,"total_interactions":638,"accounts_engaged":322},
+{"date":"2026-04-16","reach_1d":8962,"likes":334,"comments":53,"saves":97,"shares":103,"reposts":1,"views":18841,"total_interactions":696,"accounts_engaged":481},
+{"date":"2026-04-17","reach_1d":9191,"likes":298,"comments":27,"saves":103,"shares":92,"reposts":5,"views":21071,"total_interactions":617,"accounts_engaged":417},
+{"date":"2026-04-18","reach_1d":5690,"likes":195,"comments":15,"saves":88,"shares":71,"reposts":2,"views":13611,"total_interactions":443,"accounts_engaged":272},
+{"date":"2026-04-19","reach_1d":6933,"likes":311,"comments":7,"saves":112,"shares":109,"reposts":5,"views":16850,"total_interactions":656,"accounts_engaged":426},
+{"date":"2026-04-20","reach_1d":7870,"likes":361,"comments":27,"saves":110,"shares":115,"reposts":10,"views":20009,"total_interactions":742,"accounts_engaged":466},
+{"date":"2026-04-21","reach_1d":8810,"likes":378,"comments":44,"saves":141,"shares":127,"reposts":2,"views":20059,"total_interactions":867,"accounts_engaged":596},
+{"date":"2026-04-22","reach_1d":10427,"likes":408,"comments":74,"saves":199,"shares":164,"reposts":5,"views":28101,"total_interactions":1107,"accounts_engaged":717},
+{"date":"2026-04-23","reach_1d":9131,"likes":435,"comments":31,"saves":175,"shares":192,"reposts":2,"views":21658,"total_interactions":1063,"accounts_engaged":615},
+{"date":"2026-04-24","reach_1d":12653,"likes":573,"comments":53,"saves":200,"shares":263,"reposts":12,"views":30934,"total_interactions":1367,"accounts_engaged":900},
+{"date":"2026-04-25","reach_1d":17354,"likes":825,"comments":102,"saves":263,"shares":409,"reposts":16,"views":34158,"total_interactions":2025,"accounts_engaged":1196},
+{"date":"2026-04-26","reach_1d":17856,"likes":901,"comments":112,"saves":348,"shares":400,"reposts":16,"views":34275,"total_interactions":2182,"accounts_engaged":1454},
+{"date":"2026-04-27","reach_1d":24499,"likes":1059,"comments":144,"saves":491,"shares":358,"reposts":17,"views":51185,"total_interactions":2429,"accounts_engaged":1698},
+{"date":"2026-04-28","reach_1d":59393,"likes":2063,"comments":165,"saves":775,"shares":637,"reposts":51,"views":119373,"total_interactions":4350,"accounts_engaged":3173},
+{"date":"2026-04-29","reach_1d":37765,"likes":1260,"comments":105,"saves":513,"shares":363,"reposts":29,"views":75886,"total_interactions":2656,"accounts_engaged":1835},
+{"date":"2026-04-30","reach_1d":15557,"likes":600,"comments":42,"saves":256,"shares":198,"reposts":14,"views":32637,"total_interactions":1313,"accounts_engaged":861},
+{"date":"2026-05-01","reach_1d":16696,"likes":566,"comments":25,"saves":212,"shares":150,"reposts":6,"views":35805,"total_interactions":1111,"accounts_engaged":789,"follower_count_1d":null},
+{"date":"2026-05-02","reach_1d":18359,"likes":616,"comments":16,"saves":224,"shares":144,"reposts":20,"views":40076,"total_interactions":1167,"accounts_engaged":861,"follower_count_1d":91},
+{"date":"2026-05-03","reach_1d":17391,"likes":664,"comments":41,"saves":268,"shares":220,"reposts":11,"views":34589,"total_interactions":1427,"accounts_engaged":904,"follower_count_1d":124},
+{"date":"2026-05-04","reach_1d":13260,"likes":518,"comments":58,"saves":194,"shares":163,"reposts":11,"views":29435,"total_interactions":1125,"accounts_engaged":778,"follower_count_1d":97},
+{"date":"2026-05-05","reach_1d":14480,"likes":610,"comments":33,"saves":197,"shares":176,"reposts":5,"views":32206,"total_interactions":1223,"accounts_engaged":809,"follower_count_1d":108},
+{"date":"2026-05-06","reach_1d":10702,"likes":435,"comments":50,"saves":147,"shares":147,"reposts":6,"views":25900,"total_interactions":947,"accounts_engaged":604,"follower_count_1d":76},
+{"date":"2026-05-07","reach_1d":12372,"likes":549,"comments":44,"saves":167,"shares":158,"reposts":7,"views":26412,"total_interactions":1088,"accounts_engaged":763,"follower_count_1d":88},
+{"date":"2026-05-08","reach_1d":10099,"likes":465,"comments":31,"saves":147,"shares":154,"reposts":5,"views":23900,"total_interactions":960,"accounts_engaged":625,"follower_count_1d":58},
+{"date":"2026-05-09","reach_1d":9704,"likes":381,"comments":25,"saves":148,"shares":122,"reposts":9,"views":22124,"total_interactions":810,"accounts_engaged":553,"follower_count_1d":61},
+{"date":"2026-05-10","reach_1d":17844,"likes":729,"comments":64,"saves":203,"shares":136,"reposts":16,"views":39205,"total_interactions":1292,"accounts_engaged":945,"follower_count_1d":81},
+{"date":"2026-05-11","reach_1d":21643,"likes":1007,"comments":133,"saves":293,"shares":252,"reposts":15,"views":48602,"total_interactions":1961,"accounts_engaged":1324,"follower_count_1d":135},
+{"date":"2026-05-12","reach_1d":17952,"likes":843,"comments":101,"saves":274,"shares":268,"reposts":14,"views":40212,"total_interactions":1774,"accounts_engaged":1122,"follower_count_1d":136},
+{"date":"2026-05-13","reach_1d":25701,"likes":880,"comments":69,"saves":299,"shares":280,"reposts":17,"views":60902,"total_interactions":1836,"accounts_engaged":1260,"follower_count_1d":108},
+{"date":"2026-05-14","reach_1d":129483,"likes":2221,"comments":108,"saves":586,"shares":710,"reposts":51,"views":258962,"total_interactions":4390,"accounts_engaged":3182,"follower_count_1d":291},
+{"date":"2026-05-15","reach_1d":73950,"likes":1723,"comments":86,"saves":407,"shares":473,"reposts":51,"views":152675,"total_interactions":3222,"accounts_engaged":2213,"follower_count_1d":205},
+{"date":"2026-05-16","reach_1d":73515,"likes":1747,"comments":81,"saves":366,"shares":435,"reposts":37,"views":157923,"total_interactions":3122,"accounts_engaged":2240,"follower_count_1d":231},
+{"date":"2026-05-17","reach_1d":48603,"likes":1196,"comments":62,"saves":321,"shares":362,"reposts":26,"views":103752,"total_interactions":2330,"accounts_engaged":1599,"follower_count_1d":161},
+{"date":"2026-05-18","reach_1d":30749,"likes":883,"comments":58,"saves":301,"shares":278,"reposts":20,"views":65406,"total_interactions":1825,"accounts_engaged":1240,"follower_count_1d":142},
+{"date":"2026-05-19","reach_1d":31547,"likes":1037,"comments":79,"saves":259,"shares":290,"reposts":15,"views":70918,"total_interactions":1978,"accounts_engaged":1258,"follower_count_1d":124},
+{"date":"2026-05-20","reach_1d":43873,"likes":1014,"comments":48,"saves":309,"shares":309,"reposts":15,"views":100562,"total_interactions":2016,"accounts_engaged":1331,"follower_count_1d":135},
+{"date":"2026-05-21","reach_1d":26880,"likes":761,"comments":63,"saves":199,"shares":248,"reposts":18,"views":62551,"total_interactions":1571,"accounts_engaged":1041,"follower_count_1d":103},
+{"date":"2026-05-22","reach_1d":22279,"likes":724,"comments":60,"saves":175,"shares":232,"reposts":14,"views":50085,"total_interactions":1443,"accounts_engaged":958,"follower_count_1d":94},
+{"date":"2026-05-23","reach_1d":25170,"likes":692,"comments":104,"saves":200,"shares":220,"reposts":21,"views":55668,"total_interactions":1457,"accounts_engaged":956,"follower_count_1d":109},
+{"date":"2026-05-24","reach_1d":28911,"likes":792,"comments":139,"saves":243,"shares":211,"reposts":21,"views":63710,"total_interactions":1618,"accounts_engaged":1086,"follower_count_1d":137},
+{"date":"2026-05-25","reach_1d":69378,"likes":1009,"comments":166,"saves":485,"shares":379,"reposts":20,"views":145437,"total_interactions":2449,"accounts_engaged":1628,"follower_count_1d":200},
+{"date":"2026-05-26","reach_1d":52598,"likes":880,"comments":124,"saves":462,"shares":468,"reposts":17,"views":117932,"total_interactions":2430,"accounts_engaged":1606,"follower_count_1d":195},
+{"date":"2026-05-27","reach_1d":32337,"likes":742,"comments":98,"saves":304,"shares":346,"reposts":16,"views":74153,"total_interactions":1853,"accounts_engaged":1168,"follower_count_1d":137},
+{"date":"2026-05-28","reach_1d":36129,"likes":739,"comments":124,"saves":289,"shares":286,"reposts":21,"views":84064,"total_interactions":1747,"accounts_engaged":1140,"follower_count_1d":128},
+{"date":"2026-05-29","reach_1d":25137,"likes":568,"comments":74,"saves":177,"shares":209,"reposts":12,"views":57375,"total_interactions":1258,"accounts_engaged":809,"follower_count_1d":83},
+{"date":"2026-05-30","reach_1d":30403,"likes":656,"comments":56,"saves":245,"shares":165,"reposts":7,"views":70255,"total_interactions":1308,"accounts_engaged":943,"follower_count_1d":90},
+{"date":"2026-05-31","reach_1d":38875,"likes":772,"comments":59,"saves":290,"shares":244,"reposts":14,"views":80919,"total_interactions":1628,"accounts_engaged":1133,"follower_count_1d":0}
+];
+
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const TOOL = "mcp__ed6dc9e2-60a6-465c-b5c5-fef7d79a0e1e__get_data";
+const ACCOUNT_ID = "17841401468533719";
+const MO = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+const DN = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const PURPLE='#5C3D8F',TEAL='#00897B',ORANGE='#E65100',BLUE='#1565C0',PINK='#AD1457';
+
+let allWeeks=[], selIdx=0, charts={};
+
+// ─── UTILS ────────────────────────────────────────────────────────────────────
+function n(v){return v==null?0:+v||0}
+function fmt(v){v=n(v);return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1000?(v/1000).toFixed(1)+'K':String(v)}
+function full(v){return n(v).toLocaleString('es')}
+function pDate(s){
+  if(!s||typeof s!=='string')return{y:2026,m:0,d:1};
+  const c=s.slice(0,10).split('-');
+  return{y:+c[0]||2026,m:(+c[1]||1)-1,d:+c[2]||1};
+}
+function monday(s){
+  const p=pDate(s);
+  const dt=new Date(p.y,p.m,p.d);
+  const dw=dt.getDay();
+  dt.setDate(dt.getDate()-(dw===0?6:dw-1));
+  return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+}
+function wLabel(days){
+  if(!days||!days.length)return'';
+  const a=pDate(days[0].date), b=pDate(days[days.length-1].date);
+  return a.m===b.m?`${a.d}–${b.d} ${MO[a.m]}`:`${a.d} ${MO[a.m]}–${b.d} ${MO[b.m]}`;
+}
+function sumField(days,k){return days.reduce((a,d)=>a+n(d[k]),0)}
+function wStats(days){
+  // For followers: only count days where value > 0 (exclude nulls and delayed zeros)
+  const followerDays = days.filter(d => d.follower_count_1d != null && d.follower_count_1d > 0);
+  const followers = followerDays.reduce((a,d) => a + n(d.follower_count_1d), 0);
+  return{
+    reach:sumField(days,'reach_1d'),views:sumField(days,'views'),
+    interactions:sumField(days,'total_interactions'),likes:sumField(days,'likes'),
+    comments:sumField(days,'comments'),saves:sumField(days,'saves'),
+    shares:sumField(days,'shares'),reposts:sumField(days,'reposts'),
+    accounts_engaged:sumField(days,'accounts_engaged'),
+    followers: followers,
+    followers_available: followerDays.length > 0,
+    days:days.length,label:wLabel(days)
+  };
+}
+function groupWeeks(data){
+  const map={};
+  data.forEach(d=>{
+    if(!d||!d.date)return;
+    const k=monday(d.date);
+    if(!map[k])map[k]=[];
+    map[k].push(d);
+  });
+  return Object.keys(map).sort().map(k=>({key:k,days:map[k],stats:wStats(map[k])}));
+}
+function dc(p){return p>2?'up':p<-2?'dn':'nt'}
+function ds(p){return p>0?'+':''}
+
+// ─── CHARTS ──────────────────────────────────────────────────────────────────
+function mkChart(id,type,labels,datasets,opts={}){
+  if(charts[id]){charts[id].destroy();delete charts[id];}
+  const ctx=document.getElementById(id);
+  if(!ctx)return;
+  charts[id]=new Chart(ctx,{type,data:{labels,datasets},options:{
+    responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{labels:{font:{size:10},boxWidth:10,padding:8}}},
+    scales:{
+      x:{grid:{color:'#F0EBF8'},ticks:{font:{size:10},maxRotation:0}},
+      y:{grid:{color:'#F0EBF8'},ticks:{font:{size:10},callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}}
+    },...opts
+  }});
+}
+function renderCharts(weeks){
+  const labs=weeks.map(w=>w.stats.label);
+  mkChart('cReach','line',labs,[
+    {label:'Reach',data:weeks.map(w=>w.stats.reach),borderColor:PURPLE,backgroundColor:'rgba(92,61,143,.1)',fill:true,tension:.3,pointRadius:3},
+    {label:'Views',data:weeks.map(w=>w.stats.views),borderColor:TEAL,backgroundColor:'transparent',fill:false,tension:.3,pointRadius:3}
+  ]);
+  mkChart('cEng','bar',labs,[
+    {label:'Interacciones',data:weeks.map(w=>w.stats.interactions),backgroundColor:PURPLE,borderRadius:4}
+  ]);
+  mkChart('cSaves','bar',labs,[
+    {label:'Saves',data:weeks.map(w=>w.stats.saves),backgroundColor:TEAL,borderRadius:4},
+    {label:'Shares',data:weeks.map(w=>w.stats.shares),backgroundColor:ORANGE,borderRadius:4},
+    {label:'Reposts',data:weeks.map(w=>w.stats.reposts),backgroundColor:BLUE,borderRadius:4}
+  ]);
+  mkChart('cLikes','bar',labs,[
+    {label:'Likes',data:weeks.map(w=>w.stats.likes),backgroundColor:PINK,borderRadius:4},
+    {label:'Comentarios',data:weeks.map(w=>w.stats.comments),backgroundColor:BLUE,borderRadius:4}
+  ]);
+  mkChart('cAcc','line',labs,[
+    {label:'Cuentas c/Eng.',data:weeks.map(w=>w.stats.accounts_engaged),borderColor:ORANGE,backgroundColor:'rgba(230,81,0,.1)',fill:true,tension:.3,pointRadius:3}
+  ]);
+  mkChart('cFollowers','bar',labs,[
+    {label:'Nuevos seguidores',data:weeks.map(w=>w.stats.followers_available?w.stats.followers:null),backgroundColor:'#2E7D32',borderRadius:4}
+  ]);
+}
+
+// ─── KPIs ─────────────────────────────────────────────────────────────────────
+function renderKPIs(cur,prev){
+  const K=[
+    {label:'Nuevos seguidores',key:'followers',a:'#2E7D32',icon:'👤'},
+    {label:'Reach total',key:'reach',a:PURPLE,icon:'📡'},
+    {label:'Views totales',key:'views',a:TEAL,icon:'👁️'},
+    {label:'Interacciones',key:'interactions',a:ORANGE,icon:'⚡'},
+    {label:'Saves',key:'saves',a:BLUE,icon:'🔖'},
+    {label:'Shares',key:'shares',a:'#6A1B9A',icon:'📤'},
+    {label:'Comentarios',key:'comments',a:PINK,icon:'💬'},
+    {label:'Likes',key:'likes',a:'#E65100',icon:'❤️'},
+    {label:'Ctas c/ Engagement',key:'accounts_engaged',a:'#00695C',icon:'👥'},
+  ];
+  document.getElementById('kpiGrid').innerHTML=K.map(k=>{
+    const cv=n(cur[k.key]),pv=prev?n(prev[k.key]):null;
+    const pct=pv?(cv-pv)/pv*100:null;
+    const cls=pct!==null?dc(pct):'nt';
+    const delta=pct!==null
+      ?`<span class="tag ${cls}">${ds(pct)}${pct.toFixed(1)}%</span><span class="kprev">vs ${fmt(pv)}</span>`
+      :`<span class="kprev">—</span>`;
+    return`<div class="kcard" style="--a:${k.a}">
+      <div class="klabel">${k.icon} ${k.label}</div>
+      <div class="kval">${fmt(cv)}</div>
+      <div class="kdelta">${delta}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── DAILY TABLE ──────────────────────────────────────────────────────────────
+function renderDaily(days){
+  const maxR=Math.max(...days.map(d=>n(d.reach_1d)));
+  document.getElementById('dailyBody').innerHTML=days.map(d=>{
+    const p=pDate(d.date);
+    const dw=new Date(p.y,p.m,p.d).getDay();
+    const lbl=`${DN[dw]} ${p.d}/${p.m+1}`;
+    const isBest=n(d.reach_1d)===maxR;
+    const fol = d.follower_count_1d != null && d.follower_count_1d > 0 ? '+'+full(d.follower_count_1d) : '—';
+    return`<tr>
+      <td>${lbl}${isBest?'<span class="vbadge">🔥pico</span>':''}</td>
+      <td style="color:#2E7D32;font-weight:600">${fol}</td>
+      <td class="${isBest?'best':''}">${full(d.reach_1d)}</td>
+      <td>${full(d.views)}</td>
+      <td>${full(d.total_interactions)}</td>
+      <td>${full(d.likes)}</td>
+      <td>${full(d.comments)}</td>
+      <td>${full(d.saves)}</td>
+      <td>${full(d.shares)}</td>
+      <td>${full(d.reposts)}</td>
+      <td>${full(d.accounts_engaged)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── WEEK TABLE ───────────────────────────────────────────────────────────────
+function renderWeekTable(weeks){
+  const maxR=Math.max(...weeks.map(w=>w.stats.reach));
+  document.getElementById('weekBody').innerHTML=weeks.map((w,i)=>{
+    const s=w.stats,isBest=s.reach===maxR,isSel=i===selIdx;
+    const folStr = s.followers_available ? '+'+full(s.followers) : '—';
+    return`<tr class="${isSel?'sel-row':''}">
+      <td>${s.label}${isBest?'<span class="vbadge">🔥</span>':''}</td>
+      <td style="color:#2E7D32;font-weight:600">${folStr}</td>
+      <td class="${isBest?'best':''}">${full(s.reach)}</td>
+      <td>${full(s.views)}</td>
+      <td>${full(s.interactions)}</td>
+      <td>${full(s.likes)}</td>
+      <td>${full(s.saves)}</td>
+      <td>${full(s.shares)}</td>
+      <td>${full(s.comments)}</td>
+      <td>${full(s.accounts_engaged)}</td>
+      <td>${full(Math.round(s.reach/s.days))}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ─── WEEK CHIPS ───────────────────────────────────────────────────────────────
+function renderBar(){
+  const bar=document.getElementById('weekBar');
+  bar.innerHTML='<label>Semana activa:</label>'+
+    allWeeks.map((w,i)=>`<button class="chip ${i===selIdx?'active':''}" onclick="selectWeek(${i})">${w.stats.label}${i===allWeeks.length-1?' ←':''}</button>`).join('');
+}
+
+function selectWeek(i){
+  selIdx=i;
+  const cur=allWeeks[i].stats, prev=i>0?allWeeks[i-1].stats:null;
+  renderKPIs(cur,prev);
+  renderDaily(allWeeks[i].days);
+  renderBar();
+  renderWeekTable(allWeeks);
+  try{localStorage.setItem('mafe_w',i);}catch(e){}
+}
+
+// ─── RENDER ALL ───────────────────────────────────────────────────────────────
+function renderAll(data,isLive){
+  const weeks=groupWeeks(data);
+  if(!weeks.length)return;
+  allWeeks=weeks;
+  try{const sv=+localStorage.getItem('mafe_w');if(sv>=0&&sv<weeks.length)selIdx=sv;else selIdx=weeks.length-1;}
+  catch(e){selIdx=weeks.length-1;}
+
+  try{renderCharts(weeks);}catch(e){console.warn('Charts error:',e);}
+  renderBar();
+  selectWeek(selIdx);
+
+  const now=new Date();
+  const ts=`${now.getDate()} ${MO[now.getMonth()]} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('updatedAt').textContent=`Actualizado: ${ts}`;
+  const badge=document.getElementById('modeBadge');
+  badge.textContent=isLive?'🟢 Live':'🟡 Cache';
+  badge.className='badge '+(isLive?'badge-live':'badge-cache');
+}
+
+// ─── LIVE REFRESH ─────────────────────────────────────────────────────────────
+async function tryLiveData(){
+  document.getElementById('reloadBtn').textContent='⏳';
+  document.getElementById('reloadBtn').disabled=true;
+  document.getElementById('infoBox').style.display='none';
+  try{
+    if(typeof window.cowork==='undefined'||typeof window.cowork.callMcpTool!=='function'){
+      throw new Error('callMcpTool no disponible');
+    }
+    const today=new Date();
+    function pad(n){return String(n).padStart(2,'0')}
+    const toStr=`${today.getFullYear()}-${pad(today.getMonth()+1)}-${pad(today.getDate())}`;
+    const from=new Date(today.getFullYear(),today.getMonth(),today.getDate()-56);
+    const fromStr=`${from.getFullYear()}-${pad(from.getMonth()+1)}-${pad(from.getDate())}`;
+
+    const res=await window.cowork.callMcpTool(TOOL,{
+      connector:'instagram',
+      accounts:[ACCOUNT_ID],
+      fields:['date','reach_1d','likes','comments','saves','shares','reposts','views','total_interactions','accounts_engaged'],
+      date_from:fromStr,
+      date_to:toStr
+    });
+
+    // normalize response shape
+    let data=Array.isArray(res)?res:Array.isArray(res?.result)?res.result:[];
+    // detect date field if renamed
+    if(data.length){
+      const keys=Object.keys(data[0]);
+      if(!keys.includes('date')){
+        const dk=keys.find(k=>/date|day/i.test(k));
+        if(dk)data=data.map(d=>({...d,date:d[dk]}));
+      }
+    }
+    data=data.filter(d=>d&&d.date&&typeof d.date==='string'&&d.date.length>=8);
+    if(!data.length)throw new Error('Respuesta vacía');
+
+    renderAll(data,true);
+  }catch(err){
+    // show info but don't crash — keep showing embedded data
+    const box=document.getElementById('infoBox');
+    box.textContent=`ℹ️ Datos en vivo no disponibles (${err.message}). Mostrando último snapshot embebido.`;
+    box.style.display='block';
+  }finally{
+    document.getElementById('reloadBtn').textContent='↻ Actualizar';
+    document.getElementById('reloadBtn').disabled=false;
+  }
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+renderAll(EMBEDDED,false);
+tryLiveData();
+</script>
+</body>
+</html>

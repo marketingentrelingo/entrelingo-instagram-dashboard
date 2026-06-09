@@ -86,6 +86,15 @@ td:first-child{text-align:left;font-weight:600;color:#2D2440}
 <div class="content">
   <div class="info-box" id="infoBox" style="display:none"></div>
 
+  <!-- ── ALERTA VIRAL ─────────────────────────────────────────── -->
+  <div id="viralAlert" style="display:none;background:linear-gradient(135deg,#FF6F00,#E65100);color:#fff;border-radius:10px;padding:12px 16px;margin-bottom:14px;font-size:13px;font-weight:700">
+    🔥 <span id="viralAlertText"></span>
+  </div>
+
+  <!-- ── COMPARATIVA CUENTAS ──────────────────────────────────── -->
+  <div class="sec">Comparativa última semana · @mafegarcia_au vs @entrelingo</div>
+  <div id="compGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px"></div>
+
   <div class="sec">KPIs — semana seleccionada vs semana anterior</div>
   <div class="kpi-grid" id="kpiGrid"></div>
 
@@ -105,6 +114,50 @@ td:first-child{text-align:left;font-weight:600;color:#2D2440}
       <thead><tr><th>Día</th><th>+Seguidores</th><th>Reach</th><th>Views</th><th>Interacciones</th><th>Likes</th><th>Comentarios</th><th>Saves</th><th>Shares</th><th>Reposts</th><th>Ctas c/Eng.</th></tr></thead>
       <tbody id="dailyBody"></tbody>
     </table>
+  </div>
+
+  <!-- ── MANYCHAT ─────────────────────────────────────────────── -->
+  <div class="sec">ManyChat — Estado de activación y embudo de conversión</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:6px" id="manychatSection">
+
+    <!-- KPIs ManyChat -->
+    <div style="background:#fff;border-radius:10px;border:1px solid #EDE7F6;padding:16px;box-shadow:0 1px 4px rgba(92,61,143,.08)">
+      <div style="font-size:12px;font-weight:700;color:#2D2440;margin-bottom:12px">📲 Estado del sistema</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+        <div style="background:#E8F5E9;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#2E7D32">24</div>
+          <div style="font-size:10px;color:#388E3C;font-weight:600">Keywords activos</div>
+        </div>
+        <div style="background:#FFF3E0;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#E65100" id="mc_sessions">0</div>
+          <div style="font-size:10px;color:#E65100;font-weight:600">Sesiones GA4</div>
+        </div>
+        <div style="background:#FCE4EC;border-radius:8px;padding:10px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:#C62828">⚠️</div>
+          <div style="font-size:10px;color:#C62828;font-weight:600">CTAs pendientes</div>
+        </div>
+      </div>
+      <div style="background:#FFF8E1;border-left:4px solid #F9A825;border-radius:6px;padding:10px;font-size:11px;color:#5D4037;margin-bottom:10px">
+        <strong>El sistema está listo pero no activado.</strong> Los 24 keywords existen en ManyChat pero ningún post de las últimas semanas incluyó un CTA explícito. Cada post sin "Comenta [KEYWORD]" es una oportunidad perdida de conversión automática.
+      </div>
+      <div style="font-size:11px;color:#78909C;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Clicks a WhatsApp</div>
+      <div style="font-size:11px;color:#546E7A;background:#ECEFF1;border-radius:6px;padding:8px">
+        No medibles en GA4 — WhatsApp no es una página web. Para medir: añadir intermediario <code style="background:#CFD8DC;padding:1px 4px;border-radius:3px">entrelingo.com/go/keyword</code> → redirect a WhatsApp.
+      </div>
+    </div>
+
+    <!-- Tabla de keywords -->
+    <div style="background:#fff;border-radius:10px;border:1px solid #EDE7F6;padding:16px;box-shadow:0 1px 4px rgba(92,61,143,.08);overflow-y:auto;max-height:320px">
+      <div style="font-size:12px;font-weight:700;color:#2D2440;margin-bottom:10px">🔑 Keywords activos — usa el correcto según el tema del post</div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr>
+          <th style="background:#5C3D8F;color:#fff;padding:6px 8px;text-align:left;border-radius:4px 0 0 0">Keyword</th>
+          <th style="background:#5C3D8F;color:#fff;padding:6px 8px;text-align:left">Tema del post</th>
+          <th style="background:#5C3D8F;color:#fff;padding:6px 8px;text-align:left;border-radius:0 4px 0 0">Destino</th>
+        </tr></thead>
+        <tbody id="mcKeywords"></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="sec">Resumen histórico por semana</div>
@@ -174,7 +227,15 @@ const EMBEDDED_MAFE = [
 {"date":"2026-05-28","reach_1d":36129,"likes":739,"comments":124,"saves":289,"shares":286,"reposts":21,"views":84064,"total_interactions":1747,"accounts_engaged":1140,"follower_count_1d":128},
 {"date":"2026-05-29","reach_1d":25137,"likes":568,"comments":74,"saves":177,"shares":209,"reposts":12,"views":57375,"total_interactions":1258,"accounts_engaged":809,"follower_count_1d":83},
 {"date":"2026-05-30","reach_1d":30403,"likes":656,"comments":56,"saves":245,"shares":165,"reposts":7,"views":70255,"total_interactions":1308,"accounts_engaged":943,"follower_count_1d":90},
-{"date":"2026-05-31","reach_1d":38875,"likes":772,"comments":59,"saves":290,"shares":244,"reposts":14,"views":80919,"total_interactions":1628,"accounts_engaged":1133,"follower_count_1d":0}
+{"date":"2026-05-31","reach_1d":38875,"likes":772,"comments":59,"saves":290,"shares":244,"reposts":14,"views":80919,"total_interactions":1628,"accounts_engaged":1133,"follower_count_1d":154},
+{"date":"2026-06-01","reach_1d":39281,"likes":801,"comments":81,"saves":292,"shares":330,"reposts":16,"views":81661,"total_interactions":1853,"accounts_engaged":1177,"follower_count_1d":203},
+{"date":"2026-06-02","reach_1d":22475,"likes":685,"comments":41,"saves":160,"shares":273,"reposts":16,"views":49306,"total_interactions":1449,"accounts_engaged":875,"follower_count_1d":108},
+{"date":"2026-06-03","reach_1d":24699,"likes":780,"comments":51,"saves":157,"shares":261,"reposts":17,"views":54570,"total_interactions":1532,"accounts_engaged":945,"follower_count_1d":83},
+{"date":"2026-06-04","reach_1d":29131,"likes":699,"comments":35,"saves":158,"shares":247,"reposts":19,"views":67537,"total_interactions":1407,"accounts_engaged":940,"follower_count_1d":89},
+{"date":"2026-06-05","reach_1d":19307,"likes":512,"comments":48,"saves":139,"shares":147,"reposts":9,"views":46097,"total_interactions":1003,"accounts_engaged":668,"follower_count_1d":55},
+{"date":"2026-06-06","reach_1d":27606,"likes":631,"comments":24,"saves":156,"shares":150,"reposts":18,"views":60653,"total_interactions":1132,"accounts_engaged":813,"follower_count_1d":72},
+{"date":"2026-06-07","reach_1d":46311,"likes":1153,"comments":62,"saves":302,"shares":583,"reposts":26,"views":105145,"total_interactions":2713,"accounts_engaged":1721,"follower_count_1d":129},
+{"date":"2026-06-08","reach_1d":118086,"likes":1210,"comments":87,"saves":391,"shares":692,"reposts":26,"views":225224,"total_interactions":3098,"accounts_engaged":1895,"follower_count_1d":null}
 ];
 
 // ─── DATOS EMBEBIDOS @entrelingo (Windsor.ai 06-abr → 01-jun 2026) ───────────
@@ -234,7 +295,15 @@ const EMBEDDED_ENTRELINGO = [
 {"date":"2026-05-28","reach_1d":6427,"likes":289,"comments":31,"saves":52,"shares":109,"reposts":6,"views":10926,"total_interactions":597,"accounts_engaged":387,"follower_count_1d":20},
 {"date":"2026-05-29","reach_1d":5292,"likes":246,"comments":22,"saves":31,"shares":136,"reposts":7,"views":10525,"total_interactions":579,"accounts_engaged":335,"follower_count_1d":22},
 {"date":"2026-05-30","reach_1d":7700,"likes":423,"comments":26,"saves":85,"shares":126,"reposts":20,"views":15294,"total_interactions":807,"accounts_engaged":489,"follower_count_1d":22},
-{"date":"2026-05-31","reach_1d":12004,"likes":424,"comments":22,"saves":41,"shares":104,"reposts":13,"views":18910,"total_interactions":708,"accounts_engaged":507,"follower_count_1d":26}
+{"date":"2026-05-31","reach_1d":12004,"likes":424,"comments":22,"saves":41,"shares":104,"reposts":13,"views":18910,"total_interactions":708,"accounts_engaged":507,"follower_count_1d":26},
+{"date":"2026-06-01","reach_1d":9953,"likes":389,"comments":39,"saves":67,"shares":184,"reposts":13,"views":16953,"total_interactions":876,"accounts_engaged":537,"follower_count_1d":27},
+{"date":"2026-06-02","reach_1d":11836,"likes":500,"comments":30,"saves":90,"shares":291,"reposts":18,"views":20654,"total_interactions":1220,"accounts_engaged":681,"follower_count_1d":45},
+{"date":"2026-06-03","reach_1d":13030,"likes":714,"comments":38,"saves":127,"shares":315,"reposts":41,"views":28571,"total_interactions":1550,"accounts_engaged":926,"follower_count_1d":41},
+{"date":"2026-06-04","reach_1d":16258,"likes":972,"comments":36,"saves":142,"shares":443,"reposts":80,"views":30052,"total_interactions":2116,"accounts_engaged":1256,"follower_count_1d":32},
+{"date":"2026-06-05","reach_1d":16129,"likes":1061,"comments":23,"saves":156,"shares":437,"reposts":99,"views":26541,"total_interactions":2213,"accounts_engaged":1331,"follower_count_1d":35},
+{"date":"2026-06-06","reach_1d":12354,"likes":572,"comments":14,"saves":76,"shares":214,"reposts":37,"views":20127,"total_interactions":1127,"accounts_engaged":744,"follower_count_1d":25},
+{"date":"2026-06-07","reach_1d":13365,"likes":744,"comments":18,"saves":83,"shares":333,"reposts":44,"views":21339,"total_interactions":1555,"accounts_engaged":907,"follower_count_1d":28},
+{"date":"2026-06-08","reach_1d":11400,"likes":479,"comments":14,"saves":74,"shares":205,"reposts":35,"views":18902,"total_interactions":1012,"accounts_engaged":625,"follower_count_1d":null}
 ];
 
 let currentAccount = 'mafe';
@@ -430,6 +499,7 @@ function selectWeek(i){
   const cur=allWeeks[i].stats, prev=i>0?allWeeks[i-1].stats:null;
   renderKPIs(cur,prev);
   renderDaily(allWeeks[i].days);
+  checkViralAlert(allWeeks[i].days);
   renderBar();
   renderWeekTable(allWeeks);
   try{localStorage.setItem('mafe_w',i);}catch(e){}
@@ -437,13 +507,20 @@ function selectWeek(i){
 
 // ─── RENDER ALL ───────────────────────────────────────────────────────────────
 function renderAll(data,isLive){
-  const weeks=groupWeeks(data);
+  // Separate complete weeks (≥5 days) from partial; keep partial as last chip only
+  const all=groupWeeks(data);
+  if(!all.length)return;
+  const complete=all.filter(w=>w.days.length>=5);
+  const partial=all.filter(w=>w.days.length<5);
+  // Show all complete weeks + last partial if it exists (as "semana actual")
+  const weeks = partial.length ? [...complete, partial[partial.length-1]] : complete;
   if(!weeks.length)return;
   allWeeks=weeks;
   try{const sv=+localStorage.getItem('mafe_w');if(sv>=0&&sv<weeks.length)selIdx=sv;else selIdx=weeks.length-1;}
   catch(e){selIdx=weeks.length-1;}
 
   try{renderCharts(weeks);}catch(e){console.warn('Charts error:',e);}
+  try{renderComparison();}catch(e){console.warn('Comparison error:',e);}
   renderBar();
   selectWeek(selIdx);
 
@@ -504,6 +581,84 @@ async function tryLiveData(){
   }
 }
 
+// ─── COMPARATIVA CUENTAS ─────────────────────────────────────────────────────
+function lastCompleteWeek(data){
+  const weeks = groupWeeks(data);
+  // Last week with ≥5 days (complete week)
+  for(let i=weeks.length-1;i>=0;i--){ if(weeks[i].days.length>=5) return weeks[i]; }
+  return weeks[weeks.length-1];
+}
+function renderComparison(){
+  const lastWeekMafe = lastCompleteWeek(EMBEDDED_MAFE);
+  const lastWeekEnt  = lastCompleteWeek(EMBEDDED_ENTRELINGO);
+  if(!lastWeekMafe || !lastWeekEnt) return;
+  const sm = lastWeekMafe.stats, se = lastWeekEnt.stats;
+
+  function erPct(s){ return s.reach>0?(s.interactions/s.reach*100).toFixed(1)+'%':'—'; }
+  function row(label, vm, ve){
+    const better = n(vm)>n(ve)?'mafe':'entrelingo';
+    return `<tr>
+      <td style="padding:6px 10px;font-size:12px;color:#546E7A;font-weight:600">${label}</td>
+      <td style="padding:6px 10px;text-align:right;font-size:13px;font-weight:700;color:${better==='mafe'?'#2E7D32':'#2D2440'}">${typeof vm==='string'?vm:full(vm)}${better==='mafe'?' ✓':''}</td>
+      <td style="padding:6px 10px;text-align:right;font-size:13px;font-weight:700;color:${better==='entrelingo'?'#2E7D32':'#2D2440'}">${typeof ve==='string'?ve:full(ve)}${better==='entrelingo'?' ✓':''}</td>
+    </tr>`;
+  }
+
+  document.getElementById('compGrid').innerHTML = `
+    <div style="background:#fff;border-radius:10px;border:1px solid #EDE7F6;overflow:hidden;box-shadow:0 1px 4px rgba(92,61,143,.08)">
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr>
+          <th style="background:#5C3D8F;color:#fff;padding:10px;text-align:left;font-size:12px">KPI</th>
+          <th style="background:#5C3D8F;color:#fff;padding:10px;text-align:right;font-size:12px">@mafegarcia_au</th>
+          <th style="background:#5C3D8F;color:#fff;padding:10px;text-align:right;font-size:12px">@entrelingo</th>
+        </tr></thead>
+        <tbody>
+          ${row('Semana', sm.label, se.label)}
+          ${row('Reach', sm.reach, se.reach)}
+          ${row('Views', sm.views, se.views)}
+          ${row('Interacciones', sm.interactions, se.interactions)}
+          ${row('ER', erPct(sm), erPct(se))}
+          ${row('Shares', sm.shares, se.shares)}
+          ${row('Saves', sm.saves, se.saves)}
+          ${row('+Seguidores', sm.followers_available?sm.followers:'—', se.followers_available?se.followers:'—')}
+        </tbody>
+      </table>
+    </div>
+    <div style="background:#fff;border-radius:10px;border:1px solid #EDE7F6;padding:14px;box-shadow:0 1px 4px rgba(92,61,143,.08)">
+      <div style="font-size:11px;font-weight:700;color:#78909C;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Tendencia última semana</div>
+      <canvas id="cComp" style="max-height:180px"></canvas>
+    </div>`;
+
+  // Mini chart reach comparison
+  setTimeout(()=>{
+    const allM = groupWeeks(EMBEDDED_MAFE).filter(w=>w.days.length>=5).slice(-6);
+    const allE = groupWeeks(EMBEDDED_ENTRELINGO).filter(w=>w.days.length>=5).slice(-6);
+    const labs = allM.map(w=>w.stats.label);
+    if(charts['cComp']){charts['cComp'].destroy();delete charts['cComp'];}
+    const ctx=document.getElementById('cComp');
+    if(ctx) charts['cComp']=new Chart(ctx,{type:'line',data:{labels:labs,datasets:[
+      {label:'@mafegarcia_au',data:allM.map(w=>w.stats.reach),borderColor:PURPLE,backgroundColor:'rgba(92,61,143,.08)',fill:true,tension:.3,pointRadius:3},
+      {label:'@entrelingo',data:allE.map(w=>w.stats.reach),borderColor:TEAL,backgroundColor:'rgba(0,137,123,.08)',fill:true,tension:.3,pointRadius:3}
+    ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:10},boxWidth:10}}},scales:{x:{ticks:{font:{size:9}}},y:{ticks:{font:{size:9},callback:v=>v>=1000?(v/1000).toFixed(0)+'K':v}}}}});
+  },100);
+}
+
+// ─── ALERTA VIRAL ─────────────────────────────────────────────────────────────
+function checkViralAlert(days){
+  if(!days||days.length<3) return;
+  const avg = days.reduce((a,d)=>a+n(d.reach_1d),0)/days.length;
+  const viral = days.filter(d=>n(d.reach_1d)>=avg*2);
+  const box = document.getElementById('viralAlert');
+  if(viral.length){
+    const p=pDate(viral[0].date);
+    const label=`${p.d}/${p.m+1}`;
+    const mult=(n(viral[0].reach_1d)/avg).toFixed(1);
+    document.getElementById('viralAlertText').textContent =
+      `VIRAL DETECTADO — ${label} alcanzó ${full(n(viral[0].reach_1d))} cuentas (${mult}× el promedio semanal). Publica contenido de seguimiento HOY para capitalizar el algoritmo.`;
+    box.style.display='block';
+  } else { box.style.display='none'; }
+}
+
 // ─── SWITCH ACCOUNT ───────────────────────────────────────────────────────────
 function switchAccount(key){
   currentAccount = key;
@@ -524,6 +679,42 @@ function switchAccount(key){
   if(liveData) { renderAll(liveData, true); }
   else { renderAll(EMBEDDED, false); tryLiveData(); }
 }
+
+// ─── MANYCHAT KEYWORDS TABLE ──────────────────────────────────────────────────
+(function(){
+  const KW=[
+    ['AUSTRALIA2026','Migración / visas general','📱 WhatsApp'],
+    ['PLAN2026','Migración + homologación','📱 WhatsApp'],
+    ['HOMOLOGACIÓN','Skills Assessment general','📱 WhatsApp'],
+    ['SESIÓN','Agendar sesión gratis','📅 SkillsPRO'],
+    ['INGENIERO','Engineers Australia','📱 WhatsApp'],
+    ['SISTEMAS','IT / ACS','📱 WhatsApp'],
+    ['SOCIAL','Trabajo social / CWA','📱 WhatsApp'],
+    ['OFICIOS','TRA / oficios','📱 WhatsApp'],
+    ['ROL','VETASSESS','📱 WhatsApp'],
+    ['CONTADOR','CA ANZ','📱 WhatsApp'],
+    ['RECURSOS','Guías / tips gratuitos','🌐 Web'],
+    ['TRADUCCIONES','Servicios traducción','🌐 Web'],
+    ['CALCULADORA','Calculadora de puntos','🌐 Web'],
+    ['SEMÁFORO','Estado proceso migratorio','🌐 Web'],
+    ['VISA','Visa Matcher','🌐 Web'],
+    ['HOMOLOGABOT','Guía homologación','🌐 Web'],
+    ['MATE','My Aussie Mate AI','🌐 Web'],
+    ['ORÁCULO','Ciudad ideal Australia','🌐 Web'],
+    ['LINKEDIN','Análisis perfil LinkedIn','🌐 Web'],
+    ['COACH','AI Coach empleo','🌐 Web'],
+    ['LISTA','Sponsors laborales','🌐 Web'],
+    ['NEWS','Newsletter Mafe','🌐 Web'],
+    ['WEBINAR','Webinar estacional','🌐 Web'],
+    ['PLANIFICADOR','Planificador traducciones','🌐 Web'],
+  ];
+  const tb=document.getElementById('mcKeywords');
+  if(tb) tb.innerHTML=KW.map((r,i)=>`<tr style="background:${i%2===0?'#fff':'#F9F7FD'}">
+    <td style="padding:5px 8px;font-weight:700;color:#5C3D8F">${r[0]}</td>
+    <td style="padding:5px 8px;color:#37474F">${r[1]}</td>
+    <td style="padding:5px 8px;color:#546E7A">${r[2]}</td>
+  </tr>`).join('');
+})();
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 renderAll(EMBEDDED_MAFE, false);

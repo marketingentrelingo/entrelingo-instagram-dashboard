@@ -92,7 +92,7 @@ td:first-child{text-align:left;font-weight:600;color:#2D2440}
   </div>
 
   <!-- ── COMPARATIVA CUENTAS ──────────────────────────────────── -->
-  <div class="sec">Comparativa última semana · @mafegarcia_au vs @entrelingo</div>
+  <div class="sec">Comparativa última semana completa · @mafegarcia_au vs @entrelingo</div>
   <div id="compGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px"></div>
 
   <div class="sec">KPIs — semana seleccionada vs semana anterior</div>
@@ -235,7 +235,9 @@ const EMBEDDED_MAFE = [
 {"date":"2026-06-05","reach_1d":19307,"likes":512,"comments":48,"saves":139,"shares":147,"reposts":9,"views":46097,"total_interactions":1003,"accounts_engaged":668,"follower_count_1d":55},
 {"date":"2026-06-06","reach_1d":27606,"likes":631,"comments":24,"saves":156,"shares":150,"reposts":18,"views":60653,"total_interactions":1132,"accounts_engaged":813,"follower_count_1d":72},
 {"date":"2026-06-07","reach_1d":46311,"likes":1153,"comments":62,"saves":302,"shares":583,"reposts":26,"views":105145,"total_interactions":2713,"accounts_engaged":1721,"follower_count_1d":129},
-{"date":"2026-06-08","reach_1d":118086,"likes":1210,"comments":87,"saves":391,"shares":692,"reposts":26,"views":225224,"total_interactions":3098,"accounts_engaged":1895,"follower_count_1d":null}
+{"date":"2026-06-08","reach_1d":118086,"likes":1210,"comments":87,"saves":390,"shares":692,"reposts":26,"views":225253,"total_interactions":3097,"accounts_engaged":1895,"follower_count_1d":192},
+{"date":"2026-06-09","reach_1d":54203,"likes":630,"comments":57,"saves":207,"shares":340,"reposts":0,"views":106400,"total_interactions":1694,"accounts_engaged":1081,"follower_count_1d":132},
+{"date":"2026-06-10","reach_1d":42501,"likes":582,"comments":42,"saves":170,"shares":353,"reposts":0,"views":61845,"total_interactions":1588,"accounts_engaged":980,"follower_count_1d":0}
 ];
 
 // ─── DATOS EMBEBIDOS @entrelingo (Windsor.ai 06-abr → 01-jun 2026) ───────────
@@ -303,7 +305,9 @@ const EMBEDDED_ENTRELINGO = [
 {"date":"2026-06-05","reach_1d":16129,"likes":1061,"comments":23,"saves":156,"shares":437,"reposts":99,"views":26541,"total_interactions":2213,"accounts_engaged":1331,"follower_count_1d":35},
 {"date":"2026-06-06","reach_1d":12354,"likes":572,"comments":14,"saves":76,"shares":214,"reposts":37,"views":20127,"total_interactions":1127,"accounts_engaged":744,"follower_count_1d":25},
 {"date":"2026-06-07","reach_1d":13365,"likes":744,"comments":18,"saves":83,"shares":333,"reposts":44,"views":21339,"total_interactions":1555,"accounts_engaged":907,"follower_count_1d":28},
-{"date":"2026-06-08","reach_1d":11400,"likes":479,"comments":14,"saves":74,"shares":205,"reposts":35,"views":18902,"total_interactions":1012,"accounts_engaged":625,"follower_count_1d":null}
+{"date":"2026-06-08","reach_1d":11400,"likes":479,"comments":14,"saves":74,"shares":205,"reposts":35,"views":18906,"total_interactions":1012,"accounts_engaged":625,"follower_count_1d":37},
+{"date":"2026-06-09","reach_1d":12366,"likes":620,"comments":26,"saves":69,"shares":243,"reposts":31,"views":17772,"total_interactions":1232,"accounts_engaged":760,"follower_count_1d":35},
+{"date":"2026-06-10","reach_1d":11081,"likes":578,"comments":19,"saves":86,"shares":213,"reposts":35,"views":15856,"total_interactions":1144,"accounts_engaged":720,"follower_count_1d":0}
 ];
 
 let currentAccount = 'mafe';
@@ -516,8 +520,10 @@ function renderAll(data,isLive){
   const weeks = partial.length ? [...complete, partial[partial.length-1]] : complete;
   if(!weeks.length)return;
   allWeeks=weeks;
-  try{const sv=+localStorage.getItem('mafe_w');if(sv>=0&&sv<weeks.length)selIdx=sv;else selIdx=weeks.length-1;}
-  catch(e){selIdx=weeks.length-1;}
+  // Default to last COMPLETE week (≥5 days), not the partial current week
+  const defIdx=(()=>{for(let i=weeks.length-1;i>=0;i--){if(weeks[i].days.length>=5)return i;}return weeks.length-1;})();
+  try{const sv=+localStorage.getItem('mafe_w');if(sv>=0&&sv<weeks.length)selIdx=sv;else selIdx=defIdx;}
+  catch(e){selIdx=defIdx;}
 
   try{renderCharts(weeks);}catch(e){console.warn('Charts error:',e);}
   try{renderComparison();}catch(e){console.warn('Comparison error:',e);}
